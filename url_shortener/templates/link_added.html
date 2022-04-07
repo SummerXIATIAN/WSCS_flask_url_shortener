@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shortened Link</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+  </head>
+  <body>
+  <div class="field is-grouped">
+    <p class="control">
+      <a href="/">
+      <button class="button is-link">
+        MAIN
+      </button>
+      </a>
+    </p>
+    <p class="control">
+      <a href="/stats">
+      <button class="button is-danger">
+        STAT
+      </button>
+      </a>
+    </p>
+    <p class="control">
+      <a href="/clear">
+      <button class="button is-warning">
+        CLEAR_ALL
+      </button>
+      </a>
+    </p>
+  </div>
+
+  <section class="section">
+    <div class="container">
+        <div class="field">
+            <label class="label">Original URL</label>
+            <div class="control">
+                <input class="input" type="text" name="original_url" value="{{ original_url }}">
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">New URL</label>
+            <div class="control">
+                <input class="input" type="text" name="original_url" value="{{ url_for('short.redirect_to_url', short_url=new_link, _external=True) }}">
+            </div>
+        </div>
+        <div class="control">
+          <a href="{{ url_for('short.redirect_to_url', short_url=new_link, _external=True) }}">
+            <button type="submit" class="button is-link">
+              Go To Page
+            </button>
+          </a>
+        </div>
+    </div>
+  </section>
+  </body>
+</html>
+
+

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shortener Stats</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+  </head>
+  <body>
+  <div class="field is-grouped">
+    <p class="control">
+      <a href="/">
+      <button class="button is-link">
+        MAIN
+      </button>
+      </a>
+    </p>
+    <p class="control">
+      <a href="/stats">
+      <button class="button is-danger">
+        STAT
+      </button>
+      </a>
+    </p>
+    <p class="control">
+      <a href="/clear">
+      <button class="button is-warning">
+        CLEAR_ALL
+      </button>
+      </a>
+    </p>
+  </div>
+  <section class="section">
+    <div class="container">
+        <table class="table">
+            <thead>
+              <tr>
+                <th>Original URL</th>
+                <th>Short URL</th>
+                <th>Visits Counts</th>
+                <th> </th>
+                <th> </th>
+                <!-- <th> </th> -->
+              </tr>
+            </thead>
+            <tfoot>
+              <tr>
+                <th>Original URL</th>
+                <th>Short URL</th>
+                <th>Visits Counts</th>
+              </tr>
+            </tfoot>
+            <tbody>
+            {% for link in links %}
+            <tr>
+                <td><a href="{{ link.original_url }}">{{ link.original_url }}</a></td>
+                <td><a href="{{ url_for('short.redirect_to_url', short_url=link.short_url, _external=True) }}">
+                  {{ url_for('short.redirect_to_url', short_url=link.short_url, _external=True) }}
+                  </a>
+                </td>
+                <td>{{ link.visits }}</td>
+                <td><a href="{{ url_for('short.url_clear', short_url=link.short_url, _external=True) }}">
+                  <button class="button is-danger">
+                    DEL
+                  </button>
+                  </a>
+                </td>
+                <!-- <td><a href="{{ url_for('short.url_update', short_url=link.short_url, _external=True) }}">
+                  <button class="button is-info">
+                    Update
+                  </button>
+                  </a>
+                </td> -->
+                <td>
+                  <form method="POST" action="{{ url_for('short.url_update', short_url=link.short_url, _external=True) }}">
+                    <div class="field has-addons">
+                      <div class="control">
+                        <input class="input" type="text" name="update_url" placeholder="Enter Custom URL">
+                      </div>
+                      <div class="control">
+                        <button type="submit" class="button is-info">Update</button>
+                      </div>
+                    </div>
+                    
+                    <!-- <div class="field">
+                        <label class="label">Enter your custom URL</label>
+                        <div class="control">
+                            <input class="input" type="text" name="update_url">
+                        </div>
+                    </div>
+                    <div class="control">
+                        <button type="submit" class="button is-info">Update</button>
+                    </div> -->
+                </form>
+                </td>
+            </tr>
+            {% endfor %}  
+            </tbody>
+          </table>
+    </div>
+  </section>
+  </body>
+</html>
