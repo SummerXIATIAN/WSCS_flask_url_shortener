@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-
+import urllib.request
 from url_shortener.auth import requires_auth
 
 from .extensions import db
@@ -49,12 +49,17 @@ def add_link():
         original_url = "https://"+original_url
     if original_url == "https://":
         return render_template('index.html')
-    link = Link(original_url=original_url)
-    db.session.add(link)
-    db.session.commit()
+    #code = urllib.request.urlopen(original_url).getcode()
 
-    return render_template('link_added.html', 
-        new_link=link.short_url, original_url=link.original_url)
+    try:
+        status =  urllib.request.urlopen(original_url).code
+        link = Link(original_url=original_url)
+        db.session.add(link)
+        db.session.commit()
+        return render_template('link_added.html',
+            new_link=link.short_url, original_url=link.original_url)
+    except Exception as err:
+        return render_template('index.html')
 
 @short.route('/stats')
 @requires_auth

@@ -30,15 +30,26 @@
             <div class="field">
                 <label class="label">Original URL</label>
                 <div class="control">
-                    <input class="input" type="text" name="original_url">
+                    <input class="input" type="text" name="original_url" id = "ipt">
                 </div>
-                <p class="help">Enter your URL</p>
+                <p class="help", id="help_valid">Enter your URL</p>
             </div>
             <div class="control">
-                <button type="submit" class="button is-info">Shorten</button>
+                <button type="submit" class="button is-info" id="myBtn" onclick="CheckUrl()">Shorten</button>
             </div>
         </form>
     </div>
   </section>
+
+  <script>
+  function CheckUrl(){
+    var url=document.getElementById("ipt").value;
+    var reg=/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\*\+,;=.]+$/;
+    if(!reg.test(url)){
+      alert("please input a right url");
+    }
+  }
+  </script>
+
   </body>
 </html>
