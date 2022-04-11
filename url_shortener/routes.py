@@ -1,11 +1,19 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-import urllib.request
+import re
 from url_shortener.auth import requires_auth
 
 from .extensions import db
 from .models import Link
 
 short = Blueprint('short', __name__)
+
+regex = re.compile(
+        r'^(?:http|ftp)s?://' # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+        r'localhost|' #localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+        r'(?::\d+)?' # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 @short.route('/<short_url>')
 def redirect_to_url(short_url):
@@ -49,16 +57,14 @@ def add_link():
         original_url = "https://"+original_url
     if original_url == "https://":
         return render_template('index.html')
-    #code = urllib.request.urlopen(original_url).getcode()
 
-    try:
-        status =  urllib.request.urlopen(original_url).code
+    if re.match(regex, original_url) is not None:
         link = Link(original_url=original_url)
         db.session.add(link)
         db.session.commit()
         return render_template('link_added.html',
             new_link=link.short_url, original_url=link.original_url)
-    except Exception as err:
+    else:
         return render_template('index.html')
 
 @short.route('/stats')
