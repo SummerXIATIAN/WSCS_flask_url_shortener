@@ -2,9 +2,18 @@ import string
 from datetime import datetime
 from random import choices
 
+from sympy import public
+
 from .extensions import db
 
 LENGTH = 3
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(64),unique=True)
+    name = db.Column(db.String(64))
+    password = db.Column(db.String(64))
+    admin = db.Column(db.Boolean)
 
 class Link(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -12,6 +21,7 @@ class Link(db.Model):
     short_url = db.Column(db.String(8), unique=True)
     visits = db.Column(db.Integer, default=0)
     data_created = db.Column(db.DateTime, default=datetime.now)
+    # user_id = db.Column(db.Integer)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
