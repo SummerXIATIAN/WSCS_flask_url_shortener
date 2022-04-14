@@ -21,7 +21,7 @@ class Link(db.Model):
     short_url = db.Column(db.String(8), unique=True)
     visits = db.Column(db.Integer, default=0)
     data_created = db.Column(db.DateTime, default=datetime.now)
-    # user_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, default=None)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

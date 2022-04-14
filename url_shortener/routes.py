@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, make_response
 import re
 import uuid
-from url_shortener.auth import requires_auth
 from random import choices
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
+import string
 from datetime import datetime,timedelta
 from functools import wraps
 
@@ -44,21 +44,19 @@ regex = re.compile(
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 @short.route('/<short_url>')
-# @token_required
-def redirect_to_url(short_url):
-    link = Link.query.filter_by(short_url=short_url).first_or_404()
+@token_required
+def redirect_to_url(current_user,short_url):
+    link = Link.query.filter_by(short_url=short_url,user_id=current_user.id).first_or_404()
     link.visits = link.visits + 1
     db.session.commit()
     return redirect(link.original_url)
 
 @short.route('/')
-# @requires_auth
-@token_required
-def index(current_user):
+# @token_required
+def index():
     return render_template('index.html')
 
 @short.route('/add_link', methods=['POST'])
-# @requires_auth
 @token_required
 def add_link(current_user):
     original_url = request.form['original_url']
@@ -68,7 +66,7 @@ def add_link(current_user):
         return render_template('index.html')
 
     if re.match(regex, original_url) is not None:
-        link = Link(original_url=original_url)
+        link = Link(original_url=original_url, user_id=current_user.id)
         db.session.add(link)
         db.session.commit()
         return render_template('link_added.html',
@@ -77,17 +75,17 @@ def add_link(current_user):
         return render_template('index.html')
 
 @short.route('/stats')
-# @requires_auth
 # @token_required
 def stats():
     links = Link.query.all()
     return render_template('stats.html', links=links)
 
 @short.route('/<short_url>/del')
-# @requires_auth
 @token_required
 def url_clear(current_user,short_url):
-    link = Link.query.filter_by(short_url=short_url).first_or_404()
+    if not current_user.admin:
+        return jsonify({'message':'You are not allowed'}),403
+    link = Link.query.filter_by(short_url=short_url,user_id=current_user.id).first_or_404()
     db.session.delete(link)
     db.session.commit()
     return  render_template('200.html')
@@ -95,25 +93,33 @@ def url_clear(current_user,short_url):
 @short.route('/clear')
 @token_required
 def url_clear_all(current_user):
-    db.session.query(Link).delete()
+    if not current_user.admin:
+        return jsonify({'message':'You are not allowed'}),403
+    # db.session.query(Link).delete()
+    link = Link.query.filter_by(user_id=current_user.id).first_or_404()
+    db.session.delete(link)
     db.session.commit()
     return render_template('200.html')
 
-@short.route('/<short_url>/update',methods=['GET', 'POST'])
-# @requires_auth
+@short.route('/<short_url>/update',methods=['PUT', 'POST'])
 @token_required
 def url_update(current_user,short_url):
     if request.method == 'POST':
         update_url = request.form['update_url']
         if not update_url:
-            update_url = ''.join(choices('0123456789', k=4))
-        link = Link.query.filter_by(short_url=short_url).first_or_404()
+            update_url = ''.join(choices(string.digits, k=4))
+        link = Link.query.filter_by(short_url=short_url,user_id=current_user.id).first_or_404()
         link.short_url = str(update_url)
         db.session.commit()
         links_all = Link.query.all()
         return  render_template('stats.html', links=links_all)
     else:
-        return render_template('update.html')
+        update_url = ''.join(choices(string.ascii_lowercase, k=4))
+        link = Link.query.filter_by(short_url=short_url,user_id=current_user.id).first_or_404()
+        link.short_url = str(update_url)
+        db.session.commit()
+        links_all = Link.query.all()
+        return  render_template('stats.html', links=links_all)
 
 @short.errorhandler(404)
 def page_not_found(e):
@@ -210,6 +216,6 @@ def login():
         token = jwt.encode({'user_id': user.user_id,
                             'exp':datetime.utcnow()+timedelta(minutes=120)}
                             ,SECRET_KEY, algorithm='HS256')
-        return jsonify({'token':token}),redirect(url_for('short.index',token=token))
+        return jsonify({'token':token})
     
     return make_response('Could not verify',401,{'WWW-Authenticate':'Basic realm="Login Required!"'})
