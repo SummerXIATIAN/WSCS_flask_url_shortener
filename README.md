@@ -10,6 +10,8 @@ Web Service and Cloud-Based Service Assignment - 2022 - Group 28
 
 - flask
 - sqlite
+- werkzeug
+- jwt
 
 ## Run
 
