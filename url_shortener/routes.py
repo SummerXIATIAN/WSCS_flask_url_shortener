@@ -95,9 +95,7 @@ def url_clear(current_user,short_url):
 def url_clear_all(current_user):
     if not current_user.admin:
         return jsonify({'message':'You are not allowed'}),403
-    # db.session.query(Link).delete()
-    link = Link.query.filter_by(user_id=current_user.id).first_or_404()
-    db.session.delete(link)
+    db.session.query(Link).filter(Link.user_id==current_user.id).delete()
     db.session.commit()
     return render_template('200.html')
 
@@ -217,5 +215,5 @@ def login():
                             'exp':datetime.utcnow()+timedelta(minutes=120)}
                             ,SECRET_KEY, algorithm='HS256')
         return jsonify({'token':token})
-    
+
     return make_response('Could not verify',401,{'WWW-Authenticate':'Basic realm="Login Required!"'})
