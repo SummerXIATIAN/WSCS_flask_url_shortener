@@ -32,9 +32,7 @@ Web Service and Cloud-Based Service Assignment - 2022 - Group 28
 
 - POST to `http://127.0.0.1:5000/add_link` with "form-data" Body, `Key=originial_url` and `value=xxxx.com`
 
-- PUT to `http://127.0.0.1:5000/<xxx>/update` with "form-data" Body, `Key=update_url` and `value=xxx`
-
-- 
+- POST to `http://127.0.0.1:5000/<xxx>/update` with "form-data" Body, `Key=update_url` and `value=xxx`
 
 ## Manual Table
 
