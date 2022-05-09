@@ -2,7 +2,7 @@
 
 ### DECLARATION
 
-In assignment 3, we used the reference implementation of `url_shortener` and `users_auth` from Canvas (assignment2-barebone). Our work is to deploy each service in on container via docker.
+In assignment 3, we used the reference implementation of `url_shortener` and `users_auth` from Canvas (assignment2-barebone). Our work is to deploy each service on container via docker.
 
 ### Code
 
